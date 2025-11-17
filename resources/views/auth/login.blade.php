@@ -1,44 +1,105 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', 'Login')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
-    <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Login ke Akun Anda
-      </h2>
+<div class="animate-slide-in">
+    <!-- Logo & Header -->
+    <div class="text-center mb-8">
+        <div class="w-20 h-20 mx-auto mb-4 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-glow">
+            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-2">Selamat Datang Kembali</h1>
+        <p class="text-white/80">Masuk ke akun Anda untuk melanjutkan</p>
     </div>
-    <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
-      @csrf
-      <div class="rounded-md shadow-sm -space-y-px">
-        <div>
-          <label for="email" class="sr-only">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Email">
-        </div>
-        <div>
-          <label for="password" class="sr-only">Password</label>
-          <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Password">
-        </div>
-      </div>
 
-      @if ($errors->any())
-        <div class="text-red-500 text-sm">
-          {{ $errors->first() }}
+    <!-- Login Card -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 card-hover p-8">
+        <form class="space-y-6" action="{{ route('login') }}" method="POST">
+            @csrf
+
+            <!-- Email Input -->
+            <div class="space-y-2">
+                <label for="email" class="flex items-center text-sm font-medium text-white">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                    </svg>
+                    Alamat Email
+                </label>
+                <input id="email" name="email" type="email" required 
+                       class="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-white/30 transition-all duration-300"
+                       placeholder="email@example.com"
+                       value="{{ old('email') }}">
+            </div>
+
+            <!-- Password Input -->
+            <div class="space-y-2">
+                <label for="password" class="flex items-center text-sm font-medium text-white">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Password
+                </label>
+                <input id="password" name="password" type="password" required 
+                       class="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-white/30 transition-all duration-300"
+                       placeholder="Masukkan password Anda">
+            </div>
+
+            <!-- Error Messages -->
+            @if ($errors->any())
+                <div class="bg-red-500/20 border border-red-500/30 rounded-2xl p-4">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-200 text-sm">{{ $errors->first() }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                    class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
+                <span class="flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    Masuk ke Akun
+                </span>
+            </button>
+
+            <!-- Register Link -->
+            <div class="text-center pt-4 border-t border-white/10">
+                <p class="text-white/70 text-sm">
+                    Belum punya akun?
+                    <a href="{{ route('register') }}" class="text-white font-semibold hover:text-blue-200 transition-colors duration-200 ml-1 underline">
+                        Daftar Sekarang
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Demo Accounts -->
+    <div class="mt-6 bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+        <h3 class="text-white/80 text-sm font-semibold mb-2 flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Akun Demo
+        </h3>
+        <div class="grid grid-cols-1 gap-2 text-xs text-white/60">
+            <div class="flex justify-between">
+                <span>Admin:</span>
+                <span class="font-mono">admin@tokoonline.com / password</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Customer:</span>
+                <span class="font-mono">customer@tokoonline.com / password</span>
+            </div>
         </div>
-      @endif
-
-      <div>
-        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          Login
-        </button>
-      </div>
-
-      <div class="text-center">
-        <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-500">Belum punya akun? Daftar</a>
-      </div>
-    </form>
-  </div>
+    </div>
 </div>
 @endsection

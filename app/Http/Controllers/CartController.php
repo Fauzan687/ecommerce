@@ -21,16 +21,21 @@ class CartController extends Controller
 
     public function add(Request $request, $id)
     {
+        $request->validate([
+            'quantity' => 'sometimes|integer|min:1'
+        ]);
+
         $product = Product::findOrFail($id);
         $cart = session()->get('cart', []);
+        $quantity = $request->quantity ?? 1; // Ambil quantity dari request atau default 1
 
         // Jika produk sudah ada di cart, tambahkan quantity
         if(isset($cart[$id])) {
-            $cart[$id]['quantity']++;
+            $cart[$id]['quantity'] += $quantity;
         } else {
             $cart[$id] = [
                 "name" => $product->name,
-                "quantity" => 1,
+                "quantity" => $quantity,
                 "price" => $product->price,
                 "image" => $product->image
             ];
@@ -46,8 +51,11 @@ class CartController extends Controller
             $cart = session()->get('cart');
             $cart[$request->id]["quantity"] = $request->quantity;
             session()->put('cart', $cart);
-            session()->flash('success', 'Keranjang berhasil diupdate!');
+            
+            return redirect()->back()->with('success', 'Keranjang berhasil diupdate!');
         }
+        
+        return redirect()->back()->with('error', 'Gagal update keranjang.');
     }
 
     public function remove(Request $request)
@@ -58,7 +66,10 @@ class CartController extends Controller
                 unset($cart[$request->id]);
                 session()->put('cart', $cart);
             }
-            session()->flash('success', 'Produk berhasil dihapus!');
+            
+            return redirect()->back()->with('success', 'Produk berhasil dihapus dari keranjang!');
         }
+        
+        return redirect()->back()->with('error', 'Gagal menghapus produk.');
     }
 }

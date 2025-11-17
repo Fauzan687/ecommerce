@@ -5,20 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    // Untuk frontend
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(12);
-        $categories = Category::all();
+        $products = Product::with('category')
+            ->filter(request(['search', 'category']))
+            ->latest()
+            ->paginate(12);
+        
+        $categories = Category::withCount('products')->get();
+        
         return view('products.index', compact('products', 'categories'));
     }
 
     public function show(Product $product)
     {
-        return view('products.show', compact('product'));
+        $product->load('category');
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->take(4)
+            ->get();
+        
+        return view('products.show', compact('product', 'relatedProducts'));
     }
 
     // Admin methods
@@ -81,6 +92,10 @@ class ProductController extends Controller
 
         $imagePath = $product->image;
         if ($request->hasFile('image')) {
+            // Delete old image
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
@@ -98,6 +113,11 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Delete image
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+        
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
     }

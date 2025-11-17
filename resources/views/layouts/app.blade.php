@@ -23,6 +23,13 @@
         .cart-badge {
             animation: pulse 2s infinite;
         }
+
+        /* Mobile dropdown fix */
+        @media (max-width: 768px) {
+            .group:hover .group-hover\:block {
+                display: block !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -35,7 +42,7 @@
                     <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
                     </svg>
-                    TokoOnline
+                    TokoOnlineSMK
                 </a>
 
                 <!-- Search Bar (Desktop) -->
@@ -46,7 +53,7 @@
                                    name="search" 
                                    placeholder="Cari produk..." 
                                    value="{{ request('search') }}"
-                                   class="w-full px-4 py-2 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                   class="w-full px-4 py-2 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white/90 backdrop-blur-sm">
                             <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
@@ -57,17 +64,19 @@
                 <!-- Navigation Links -->
                 <div class="flex items-center space-x-4">
                     @auth
-                        <!-- Cart Icon -->
+                        <!-- Cart Icon - HANYA UNTUK CUSTOMER -->
+                        @if(!auth()->user()->is_admin)
                         <a href="{{ route('cart.index') }}" class="relative text-white hover:text-blue-100 transition">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                             </svg>
-                            @if(session('cart') && count(session('cart')) > 0)
+                            @if(session()->has('cart') && is_array(session('cart')) && count(session('cart')) > 0)
                                 <span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                                     {{ count(session('cart')) }}
                                 </span>
                             @endif
                         </a>
+                        @endif
 
                         <!-- User Dropdown -->
                         <div class="relative group">
@@ -77,15 +86,33 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block animate-slide-down">
-                                <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
-                                    📦 Pesanan Saya
-                                </a>
-                                @if(auth()->user()->is_admin)
-                                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
-                                        ⚙️ Admin Panel
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block lg:group-hover:block animate-slide-down z-50">
+                                <!-- MENU CUSTOMER -->
+                                @if(!auth()->user()->is_admin)
+                                    <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
+                                        📦 Pesanan Saya
+                                    </a>
+                                    <a href="{{ route('cart.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
+                                        🛒 Keranjang Saya
                                     </a>
                                 @endif
+
+                                <!-- MENU ADMIN -->
+                                @if(auth()->user()->is_admin)
+                                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
+                                        📊 Dashboard
+                                    </a>
+                                    <a href="{{ route('admin.products.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
+                                        📦 Kelola Produk
+                                    </a>
+                                    <a href="{{ route('admin.orders.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
+                                        📋 Kelola Pesanan
+                                    </a>
+                                    <a href="{{ route('admin.categories.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition">
+                                        🏷️ Kelola Kategori
+                                    </a>
+                                @endif
+
                                 <hr class="my-2">
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
@@ -114,7 +141,7 @@
                                name="search" 
                                placeholder="Cari produk..." 
                                value="{{ request('search') }}"
-                               class="w-full px-4 py-2 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
+                               class="w-full px-4 py-2 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white/90 backdrop-blur-sm">
                         <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -158,9 +185,13 @@
                     <h4 class="font-semibold mb-4">Link Cepat</h4>
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="{{ route('products.index') }}" class="hover:text-white transition">Produk</a></li>
-                        <li><a href="{{ route('cart.index') }}" class="hover:text-white transition">Keranjang</a></li>
                         @auth
-                            <li><a href="{{ route('orders.index') }}" class="hover:text-white transition">Pesanan</a></li>
+                            @if(!auth()->user()->is_admin)
+                                <li><a href="{{ route('cart.index') }}" class="hover:text-white transition">Keranjang</a></li>
+                                <li><a href="{{ route('orders.index') }}" class="hover:text-white transition">Pesanan</a></li>
+                            @else
+                                <li><a href="{{ route('admin.dashboard') }}" class="hover:text-white transition">Admin Dashboard</a></li>
+                            @endif
                         @endauth
                     </ul>
                 </div>
@@ -191,6 +222,29 @@
                 setTimeout(() => alert.remove(), 500);
             });
         }, 5000);
+
+        // Mobile dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const userButton = document.querySelector('.relative.group button');
+            const dropdownMenu = document.querySelector('.relative.group .hidden');
+            
+            if (userButton && dropdownMenu) {
+                userButton.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropdownMenu.classList.toggle('hidden');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.relative.group')) {
+                        dropdownMenu.classList.add('hidden');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
