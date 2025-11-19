@@ -19,31 +19,36 @@ class CartController extends Controller
         return view('cart.index', compact('cart', 'total'));
     }
 
-    public function add(Request $request, $id)
-    {
-        $request->validate([
-            'quantity' => 'sometimes|integer|min:1'
-        ]);
+   public function add(Request $request, $id)
+{
+    $request->validate([
+        'quantity' => 'sometimes|integer|min:1'
+    ]);
 
-        $product = Product::findOrFail($id);
-        $cart = session()->get('cart', []);
-        $quantity = $request->quantity ?? 1; // Ambil quantity dari request atau default 1
-
-        // Jika produk sudah ada di cart, tambahkan quantity
-        if(isset($cart[$id])) {
-            $cart[$id]['quantity'] += $quantity;
-        } else {
-            $cart[$id] = [
-                "name" => $product->name,
-                "quantity" => $quantity,
-                "price" => $product->price,
-                "image" => $product->image
-            ];
-        }
-
-        session()->put('cart', $cart);
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+    $product = Product::findOrFail($id);
+    
+    // Cek stok
+    $quantity = $request->quantity ?? 1;
+    if ($product->stock < $quantity) {
+        return redirect()->back()->with('error', 'Stok produk tidak mencukupi!');
     }
+
+    $cart = session()->get('cart', []);
+
+    if(isset($cart[$id])) {
+        $cart[$id]['quantity'] += $quantity;
+    } else {
+        $cart[$id] = [
+            "name" => $product->name,
+            "quantity" => $quantity,
+            "price" => $product->price,
+            "image" => $product->image
+        ];
+    }
+
+    session()->put('cart', $cart);
+    return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+}
 
     public function update(Request $request)
     {

@@ -82,7 +82,12 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())->with('orderItems.product')->latest()->get();
+        // PERBAIKAN: Pakai paginate() bukan get()
+        $orders = Order::where('user_id', Auth::id())
+            ->with('orderItems.product.category')
+            ->latest()
+            ->paginate(10); // 10 orders per page
+        
         return view('orders.index', compact('orders'));
     }
 
