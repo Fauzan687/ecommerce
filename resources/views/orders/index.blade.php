@@ -21,7 +21,7 @@
             $pendingCount = $orders->where('status', 'pending')->count();
             $processingCount = $orders->where('status', 'processing')->count();
             $completedCount = $orders->where('status', 'completed')->count();
-            $cancelledCount = $orders->where('status', 'cancelled')->count();
+            $unpaidCount = $orders->where('payment_status', 'unpaid')->count();
         @endphp
         
         <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-6 text-white text-center transform hover:scale-105 transition duration-300 shadow-lg">
@@ -49,10 +49,10 @@
         </div>
         
         <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white text-center transform hover:scale-105 transition duration-300 shadow-lg">
-            <div class="text-3xl font-bold mb-2">{{ $cancelledCount }}</div>
+            <div class="text-3xl font-bold mb-2">{{ $unpaidCount }}</div>
             <div class="text-red-100 flex items-center justify-center gap-2">
-                <i class="fas fa-times-circle"></i>
-                <span>Dibatalkan</span>
+                <i class="fas fa-credit-card"></i>
+                <span>Belum Bayar</span>
             </div>
         </div>
     </div>
@@ -74,7 +74,26 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Payment Status Badge -->
+                        <span class="px-4 py-2 rounded-full text-sm font-semibold
+                            @if($order->payment_status == 'paid') 
+                                bg-green-100 text-green-800 border border-green-200
+                            @elseif($order->payment_status == 'failed') 
+                                bg-red-100 text-red-800 border border-red-200
+                            @else 
+                                bg-yellow-100 text-yellow-800 border border-yellow-200
+                            @endif">
+                            @if($order->payment_status == 'paid') 
+                                <i class="fas fa-check-circle mr-2"></i>Lunas
+                            @elseif($order->payment_status == 'failed') 
+                                <i class="fas fa-times-circle mr-2"></i>Gagal
+                            @else 
+                                <i class="fas fa-clock mr-2"></i>Belum Bayar
+                            @endif
+                        </span>
+
+                        <!-- Order Status Badge -->
                         <span class="px-4 py-2 rounded-full text-sm font-semibold
                             @if($order->status == 'pending') 
                                 bg-yellow-100 text-yellow-800 border border-yellow-200
@@ -149,18 +168,24 @@
                     </div>
                     
                     <div class="flex gap-3">
+                        <!-- Payment Button (if unpaid) -->
+                        @if($order->payment_status != 'paid' && $order->status != 'cancelled')
+                            <form action="{{ route('payment.checkout', $order) }}" method="POST">
+                                @csrf
+                                <button type="submit" 
+                                        class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg hover:shadow-xl flex items-center gap-2 group">
+                                    <i class="fas fa-credit-card group-hover:scale-110 transition"></i>
+                                    <span>Bayar Sekarang</span>
+                                </button>
+                            </form>
+                        @endif
+
+                        <!-- View Detail Button -->
                         <a href="{{ route('orders.show', $order) }}" 
                            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg hover:shadow-xl flex items-center gap-2 group">
                             <i class="fas fa-eye group-hover:scale-110 transition"></i>
                             <span>Detail Pesanan</span>
                         </a>
-                        
-                        @if($order->status == 'pending')
-                        <button class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg hover:shadow-xl flex items-center gap-2 group">
-                            <i class="fas fa-times group-hover:scale-110 transition"></i>
-                            <span>Batalkan</span>
-                        </button>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -168,7 +193,7 @@
         @endforeach
     </div>
 
-    <!-- Load More / Pagination -->
+    <!-- Pagination -->
     @if($orders->hasPages())
     <div class="mt-8 flex justify-center animate-fade-in" style="animation-delay: 0.3s;">
         <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -199,33 +224,6 @@
                 <span>Kembali ke Beranda</span>
             </a>
         </div>
-        
-        <!-- Quick Tips -->
-        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div class="text-center p-6 bg-blue-50 rounded-2xl">
-                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-search text-white"></i>
-                </div>
-                <h4 class="font-semibold text-gray-800 mb-2">Jelajahi Katalog</h4>
-                <p class="text-gray-600 text-sm">Temukan berbagai produk berkualitas dari berbagai kategori</p>
-            </div>
-            
-            <div class="text-center p-6 bg-green-50 rounded-2xl">
-                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-cart-plus text-white"></i>
-                </div>
-                <h4 class="font-semibold text-gray-800 mb-2">Tambah ke Keranjang</h4>
-                <p class="text-gray-600 text-sm">Pilih produk favorit dan tambahkan ke keranjang belanja</p>
-            </div>
-            
-            <div class="text-center p-6 bg-purple-50 rounded-2xl">
-                <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-credit-card text-white"></i>
-                </div>
-                <h4 class="font-semibold text-gray-800 mb-2">Checkout dengan Mudah</h4>
-                <p class="text-gray-600 text-sm">Selesaikan pembayaran dan tunggu pesanan sampai</p>
-            </div>
-        </div>
     </div>
     @endif
 </div>
@@ -253,94 +251,5 @@
 .hover-lift:hover {
     transform: translateY(-5px);
 }
-
-/* Custom pagination styles */
-.pagination {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.page-item {
-    display: inline-block;
-}
-
-.page-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.page-item.active .page-link {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    color: white;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.page-item:not(.active) .page-link {
-    background: #f8fafc;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-}
-
-.page-item:not(.active) .page-link:hover {
-    background: #3b82f6;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-}
-
-.page-item.disabled .page-link {
-    background: #f1f5f9;
-    color: #94a3b8;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
 </style>
-
-<script>
-// Add intersection observer for scroll animations
-document.addEventListener('DOMContentLoaded', function() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // Observe order cards for animation
-    document.querySelectorAll('.bg-white.rounded-2xl').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'all 0.6s ease';
-        observer.observe(card);
-    });
-
-    // Add loading state to action buttons
-    const actionButtons = document.querySelectorAll('a[href*="orders.show"]');
-    actionButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const originalHTML = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memuat...';
-            
-            // Reset after 2 seconds (in case of slow loading)
-            setTimeout(() => {
-                this.innerHTML = originalHTML;
-            }, 2000);
-        });
-    });
-});
-</script>
 @endsection

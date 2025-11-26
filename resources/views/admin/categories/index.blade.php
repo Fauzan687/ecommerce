@@ -84,7 +84,7 @@
                         <th class="px-6 py-4 text-left font-semibold text-sm uppercase tracking-wider">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-link"></i>
-                                <span>Slug</span>
+                                <span>Jenis</span>
                             </div>
                         </th>
                         <th class="px-6 py-4 text-left font-semibold text-sm uppercase tracking-wider">

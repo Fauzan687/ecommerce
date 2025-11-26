@@ -22,25 +22,44 @@
                 <p class="text-gray-600">{{ $order->created_at->format('d F Y, H:i') }} WIB</p>
                 <p class="text-gray-600 mt-1">User: {{ $order->user->name }} ({{ $order->user->email }})</p>
             </div>
-            <span class="px-4 py-2 rounded-lg font-semibold
-                @if($order->status == 'pending') bg-yellow-100 text-yellow-800
-                @elseif($order->status == 'processing') bg-blue-100 text-blue-800
-                @elseif($order->status == 'completed') bg-green-100 text-green-800
-                @else bg-red-100 text-red-800
-                @endif">
-                @if($order->status == 'pending') ⏳ Menunggu Konfirmasi
-                @elseif($order->status == 'processing') 📦 Sedang Diproses
-                @elseif($order->status == 'completed') ✅ Selesai
-                @else ❌ Dibatalkan
-                @endif
-            </span>
+            
+            <div class="flex flex-col gap-2">
+                <!-- Payment Status -->
+                <span class="px-4 py-2 rounded-lg font-semibold text-center
+                    @if($order->payment_status == 'paid') bg-green-100 text-green-800
+                    @elseif($order->payment_status == 'failed') bg-red-100 text-red-800
+                    @else bg-yellow-100 text-yellow-800
+                    @endif">
+                    @if($order->payment_status == 'paid')
+                        ✅ Pembayaran Lunas
+                    @elseif($order->payment_status == 'failed')
+                        ❌ Pembayaran Gagal
+                    @else
+                        ⏳ Belum Dibayar
+                    @endif
+                </span>
+
+                <!-- Order Status -->
+                <span class="px-4 py-2 rounded-lg font-semibold text-center
+                    @if($order->status == 'pending') bg-yellow-100 text-yellow-800
+                    @elseif($order->status == 'processing') bg-blue-100 text-blue-800
+                    @elseif($order->status == 'completed') bg-green-100 text-green-800
+                    @else bg-red-100 text-red-800
+                    @endif">
+                    @if($order->status == 'pending') ⏳ Menunggu Konfirmasi
+                    @elseif($order->status == 'processing') 📦 Sedang Diproses
+                    @elseif($order->status == 'completed') ✅ Selesai
+                    @else ❌ Dibatalkan
+                    @endif
+                </span>
+            </div>
         </div>
 
         <!-- Update Status Form -->
         <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="mt-6 p-4 bg-gray-50 rounded-lg">
             @csrf
             <div class="flex items-center gap-4">
-                <label class="font-semibold text-gray-700">Update Status:</label>
+                <label class="font-semibold text-gray-700">Update Status Pesanan:</label>
                 <select name="status" class="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
                     <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
@@ -84,8 +103,58 @@
             </div>
         </div>
 
-        <!-- Shipping Info -->
+        <!-- Right Sidebar -->
         <div class="space-y-6">
+            <!-- Payment Info -->
+            @if($order->payment)
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    Info Pembayaran
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm text-gray-600">Status Pembayaran</p>
+                        <p class="font-semibold
+                            @if($order->payment->status == 'completed') text-green-600
+                            @elseif($order->payment->status == 'failed') text-red-600
+                            @else text-yellow-600
+                            @endif">
+                            {{ ucfirst($order->payment->status) }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Metode Pembayaran</p>
+                        <p class="font-semibold">{{ ucfirst($order->payment->payment_method) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Jumlah</p>
+                        <p class="font-semibold">Rp {{ number_format($order->payment->amount, 0, ',', '.') }}</p>
+                    </div>
+                    @if($order->payment->paid_at)
+                    <div>
+                        <p class="text-sm text-gray-600">Dibayar Pada</p>
+                        <p class="font-semibold">{{ $order->payment->paid_at->format('d/m/Y H:i') }}</p>
+                    </div>
+                    @endif
+                    @if($order->payment->stripe_payment_id)
+                    <div>
+                        <p class="text-sm text-gray-600">Payment ID</p>
+                        <p class="font-semibold text-xs break-all">{{ $order->payment->stripe_payment_id }}</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @else
+            <div class="bg-yellow-50 rounded-xl p-6 border-2 border-yellow-200">
+                <h3 class="font-bold text-yellow-900 mb-2">⚠️ Belum Ada Pembayaran</h3>
+                <p class="text-sm text-yellow-800">Pesanan ini belum memiliki record pembayaran</p>
+            </div>
+            @endif
+
+            <!-- Shipping Info -->
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-xl font-bold mb-4">📍 Info Pengiriman</h2>
                 <div class="space-y-3">

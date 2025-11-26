@@ -23,6 +23,22 @@
             50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .animate-slide-down {
             animation: slideDown 0.5s ease-out;
         }
@@ -30,7 +46,15 @@
         .animate-fade-in {
             animation: fadeIn 0.6s ease-out;
         }
+
+        .animate-slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
         
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
         .pulse-glow {
             animation: pulse-glow 2s infinite;
         }
@@ -43,7 +67,7 @@
         }
         
         .glass-dark {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(15, 23, 42, 0.9); /* Darker background for better contrast */
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -84,6 +108,22 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
+        /* Card hover effects */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Input focus effects */
+        .input-focus:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
         /* Mobile menu animation */
         .mobile-menu-enter {
             transform: translateX(100%);
@@ -93,9 +133,58 @@
             transform: translateX(0);
             transition: transform 0.3s ease-out;
         }
+
+        /* Background animation elements */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: -50px;
+            animation-delay: 0s;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            right: -30px;
+            animation-delay: -2s;
+        }
+
+        .bg-circle:nth-child(3) {
+            width: 180px;
+            height: 180px;
+            bottom: 10%;
+            left: 10%;
+            animation-delay: -4s;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex flex-col font-sans">
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex flex-col font-sans relative">
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
     <!-- Navigation Bar -->
     <nav class="sticky top-0 z-50 glass-dark border-b border-white/20">
         <div class="container mx-auto px-4">
@@ -114,18 +203,18 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
-                    <a href="{{ url('/') }}" class="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 font-medium flex items-center space-x-2">
+                    <a href="{{ url('/') }}" class="px-4 py-2 rounded-lg text-white hover:bg-blue-500/20 hover:text-blue-200 transition-all duration-300 font-medium flex items-center space-x-2">
                         <i class="fas fa-home"></i>
                         <span>Beranda</span>
                     </a>
-                    <a href="{{ route('products.index') }}" class="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 font-medium flex items-center space-x-2">
+                    <a href="{{ route('products.index') }}" class="px-4 py-2 rounded-lg text-white hover:bg-blue-500/20 hover:text-blue-200 transition-all duration-300 font-medium flex items-center space-x-2">
                         <i class="fas fa-box"></i>
                         <span>Produk</span>
                     </a>
                     
                     @auth
                         @if(!auth()->user()->is_admin)
-                            <a href="{{ route('cart.index') }}" class="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 font-medium flex items-center space-x-2 relative">
+                            <a href="{{ route('cart.index') }}" class="px-4 py-2 rounded-lg text-white hover:bg-blue-500/20 hover:text-blue-200 transition-all duration-300 font-medium flex items-center space-x-2 relative">
                                 <i class="fas fa-shopping-cart"></i>
                                 <span>Keranjang</span>
                                 @if(session()->has('cart') && is_array(session('cart')) && count(session('cart')) > 0)
@@ -134,12 +223,12 @@
                                     </span>
                                 @endif
                             </a>
-                            <a href="{{ route('orders.index') }}" class="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 font-medium flex items-center space-x-2">
+                            <a href="{{ route('orders.index') }}" class="px-4 py-2 rounded-lg text-white hover:bg-blue-500/20 hover:text-blue-200 transition-all duration-300 font-medium flex items-center space-x-2">
                                 <i class="fas fa-clipboard-list"></i>
                                 <span>Pesanan</span>
                             </a>
                         @else
-                            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-all duration-300 font-medium flex items-center space-x-2">
+                            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 rounded-lg text-white hover:bg-blue-500/20 hover:text-blue-200 transition-all duration-300 font-medium flex items-center space-x-2">
                                 <i class="fas fa-chart-line"></i>
                                 <span>Dashboard</span>
                             </a>
@@ -166,51 +255,69 @@
                     @auth
                         <!-- User Dropdown -->
                         <div class="relative group">
-                            <button class="flex items-center space-x-3 bg-white/10 hover:bg-white/20 rounded-2xl px-4 py-2 transition-all duration-300 group">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
-                                </div>
-                                <span class="text-white font-medium hidden lg:block">{{ auth()->user()->name }}</span>
-                                <i class="fas fa-chevron-down text-white text-sm transform group-hover:rotate-180 transition-transform duration-300"></i>
+                            <button class="flex items-center space-x-3 bg-white/10 hover:bg-blue-500/20 text-white hover:text-blue-200 rounded-2xl px-4 py-2 transition-all duration-300 group">
+                                <img src="{{ auth()->user()->avatar_url }}" 
+                                     alt="{{ auth()->user()->name }}"
+                                     class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-lg">
+                                <span class="font-medium hidden lg:block">{{ auth()->user()->name }}</span>
+                                <i class="fas fa-chevron-down text-sm transform group-hover:rotate-180 transition-transform duration-300"></i>
                             </button>
                             
                             <div class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl py-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 z-50 border border-gray-100">
                                 <!-- User Info -->
                                 <div class="px-4 py-3 border-b border-gray-100">
-                                    <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
-                                    <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>
-                                    <span class="inline-block mt-1 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
-                                        {{ auth()->user()->is_admin ? 'Administrator' : 'Customer' }}
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <img src="{{ auth()->user()->avatar_url }}" 
+                                             alt="{{ auth()->user()->name }}"
+                                             class="w-12 h-12 rounded-full object-cover border-2 border-blue-100">
+                                        <div class="flex-1">
+                                            <p class="font-semibold text-gray-800 truncate">{{ auth()->user()->name }}</p>
+                                            <p class="text-sm text-gray-600 truncate">{{ auth()->user()->email }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="inline-block px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full font-semibold">
+                                        {{ auth()->user()->is_admin ? '👑 Administrator' : '👤 Customer' }}
                                     </span>
                                 </div>
                                 
                                 <!-- Menu Items -->
                                 <div class="py-2">
+                                    <!-- Profile Link for All Users -->
+                                    <a href="{{ route('profile.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">
+                                        <i class="fas fa-user w-5 group-hover:scale-110 transition-transform"></i>
+                                        <span>Profil Saya</span>
+                                    </a>
+                                    
                                     @if(auth()->user()->is_admin)
-                                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                            <i class="fas fa-chart-line w-5"></i>
+                                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 group">
+                                            <i class="fas fa-chart-line w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Dashboard</span>
                                         </a>
-                                        <a href="{{ route('admin.products.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                            <i class="fas fa-box w-5"></i>
+                                        <a href="{{ route('admin.products.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">
+                                            <i class="fas fa-box w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Kelola Produk</span>
                                         </a>
-                                        <a href="{{ route('admin.orders.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                            <i class="fas fa-clipboard-list w-5"></i>
+                                        <a href="{{ route('admin.orders.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-all duration-200 group">
+                                            <i class="fas fa-clipboard-list w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Kelola Pesanan</span>
                                         </a>
-                                        <a href="{{ route('admin.categories.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                            <i class="fas fa-tags w-5"></i>
+                                        <a href="{{ route('admin.categories.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 group">
+                                            <i class="fas fa-tags w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Kelola Kategori</span>
                                         </a>
                                     @else
-                                        <a href="{{ route('orders.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                            <i class="fas fa-clipboard-list w-5"></i>
+                                        <a href="{{ route('orders.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-all duration-200 group">
+                                            <i class="fas fa-clipboard-list w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Pesanan Saya</span>
                                         </a>
-                                        <a href="{{ route('cart.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                            <i class="fas fa-shopping-cart w-5"></i>
+                                        <a href="{{ route('cart.index') }}" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">
+                                            <i class="fas fa-shopping-cart w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Keranjang Saya</span>
+                                            @if(session()->has('cart') && is_array(session('cart')) && count(session('cart')) > 0)
+                                                <span class="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                                    {{ count(session('cart')) }}
+                                                </span>
+                                            @endif
                                         </a>
                                     @endif
                                 </div>
@@ -219,8 +326,8 @@
                                 <div class="border-t border-gray-100 pt-2">
                                     <form action="{{ route('logout') }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="flex items-center space-x-3 w-full px-4 py-2 text-red-600 hover:bg-red-50 transition-all duration-200">
-                                            <i class="fas fa-sign-out-alt w-5"></i>
+                                        <button type="submit" class="flex items-center space-x-3 w-full px-4 py-2 text-red-600 hover:bg-red-50 transition-all duration-200 group">
+                                            <i class="fas fa-sign-out-alt w-5 group-hover:scale-110 transition-transform"></i>
                                             <span>Keluar</span>
                                         </button>
                                     </form>
@@ -229,7 +336,7 @@
                         </div>
                     @else
                         <div class="flex items-center space-x-3">
-                            <a href="{{ route('login') }}" class="text-white hover:text-blue-100 transition px-4 py-2 rounded-xl hover:bg-white/10 font-medium">
+                            <a href="{{ route('login') }}" class="text-white hover:text-blue-200 transition px-4 py-2 rounded-xl hover:bg-blue-500/20 font-medium">
                                 Masuk
                             </a>
                             <a href="{{ route('register') }}" class="bg-white text-blue-600 hover:bg-blue-50 transition px-6 py-2 rounded-xl font-semibold shadow-lg hover-lift">
@@ -239,7 +346,7 @@
                     @endauth
 
                     <!-- Mobile Menu Button -->
-                    <button id="mobileMenuButton" class="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 transition">
+                    <button id="mobileMenuButton" class="lg:hidden text-white p-2 rounded-lg hover:bg-blue-500/20 hover:text-blue-200 transition">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -264,18 +371,23 @@
         <div id="mobileMenu" class="lg:hidden glass-dark border-t border-white/20 hidden">
             <div class="container mx-auto px-4 py-4">
                 <div class="flex flex-col space-y-3">
-                    <a href="{{ url('/') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition">
+                    <a href="{{ url('/') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-blue-500/20 hover:text-blue-200 transition">
                         <i class="fas fa-home w-5"></i>
                         <span>Beranda</span>
                     </a>
-                    <a href="{{ route('products.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition">
+                    <a href="{{ route('products.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-blue-500/20 hover:text-blue-200 transition">
                         <i class="fas fa-box w-5"></i>
                         <span>Produk</span>
                     </a>
                     
                     @auth
+                        <a href="{{ route('profile.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-blue-500/20 hover:text-blue-200 transition">
+                            <i class="fas fa-user w-5"></i>
+                            <span>Profil Saya</span>
+                        </a>
+                        
                         @if(!auth()->user()->is_admin)
-                            <a href="{{ route('cart.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition relative">
+                            <a href="{{ route('cart.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-blue-500/20 hover:text-blue-200 transition relative">
                                 <i class="fas fa-shopping-cart w-5"></i>
                                 <span>Keranjang</span>
                                 @if(session()->has('cart') && is_array(session('cart')) && count(session('cart')) > 0)
@@ -284,12 +396,12 @@
                                     </span>
                                 @endif
                             </a>
-                            <a href="{{ route('orders.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition">
+                            <a href="{{ route('orders.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-blue-500/20 hover:text-blue-200 transition">
                                 <i class="fas fa-clipboard-list w-5"></i>
                                 <span>Pesanan</span>
                             </a>
                         @else
-                            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition">
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:bg-blue-500/20 hover:text-blue-200 transition">
                                 <i class="fas fa-chart-line w-5"></i>
                                 <span>Dashboard</span>
                             </a>
@@ -325,111 +437,6 @@
     <main class="flex-grow">
         @yield('content')
     </main>
-
-    <!-- Footer -->
-    <footer class="bg-gradient-to-br from-gray-900 to-gray-800 text-white mt-16">
-        <div class="container mx-auto px-4 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Company Info -->
-                <div class="md:col-span-2">
-                    <div class="flex items-center space-x-3 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-store text-white"></i>
-                        </div>
-                        <span class="text-2xl font-bold">TokoOnlineSMK</span>
-                    </div>
-                    <p class="text-gray-300 mb-6 leading-relaxed max-w-md">
-                        Platform e-commerce modern yang dirancang khusus untuk pembelajaran SMK. Temukan produk berkualitas dengan pengalaman belanja terbaik.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-blue-600 rounded-full flex items-center justify-center transition hover-lift">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-pink-600 rounded-full flex items-center justify-center transition hover-lift">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-blue-400 rounded-full flex items-center justify-center transition hover-lift">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-green-500 rounded-full flex items-center justify-center transition hover-lift">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-lg font-bold mb-6 text-white">Link Cepat</h3>
-                    <ul class="space-y-3">
-                        <li>
-                            <a href="{{ route('products.index') }}" class="text-gray-300 hover:text-white transition flex items-center space-x-2 group">
-                                <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition"></i>
-                                <span>Produk</span>
-                            </a>
-                        </li>
-                        @auth
-                            @if(!auth()->user()->is_admin)
-                                <li>
-                                    <a href="{{ route('cart.index') }}" class="text-gray-300 hover:text-white transition flex items-center space-x-2 group">
-                                        <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition"></i>
-                                        <span>Keranjang</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('orders.index') }}" class="text-gray-300 hover:text-white transition flex items-center space-x-2 group">
-                                        <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition"></i>
-                                        <span>Pesanan</span>
-                                    </a>
-                                </li>
-                            @else
-                                <li>
-                                    <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white transition flex items-center space-x-2 group">
-                                        <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition"></i>
-                                        <span>Admin Dashboard</span>
-                                    </a>
-                                </li>
-                            @endif
-                        @endauth
-                    </ul>
-                </div>
-
-                <!-- Contact Info -->
-                <div>
-                    <h3 class="text-lg font-bold mb-6 text-white">Kontak Kami</h3>
-                    <ul class="space-y-4">
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <i class="fas fa-envelope text-blue-400"></i>
-                            <span>info@tokoonlinesmk.com</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <i class="fas fa-phone text-green-400"></i>
-                            <span>+62 123-456-7890</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <i class="fas fa-map-marker-alt text-red-400"></i>
-                            <span>Jakarta, Indonesia</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <i class="fas fa-clock text-yellow-400"></i>
-                            <span>Buka 24/7</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Bottom Bar -->
-            <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm mb-4 md:mb-0">
-                    &copy; 2024 TokoOnlineSMK. All rights reserved. | Project E-Commerce untuk SMK
-                </p>
-                <div class="flex space-x-6 text-sm text-gray-400">
-                    <a href="#" class="hover:text-white transition">Privacy Policy</a>
-                    <a href="#" class="hover:text-white transition">Terms of Service</a>
-                    <a href="#" class="hover:text-white transition">Cookie Policy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <!-- Back to Top Button -->
     <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-2xl hover-lift transition-all duration-300 opacity-0 invisible z-40">
@@ -498,6 +505,32 @@
                         }, 150);
                     }
                 });
+            });
+
+            // Add parallax effect to background circles
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const circles = document.querySelectorAll('.bg-circle');
+                
+                circles.forEach((circle, index) => {
+                    const rate = scrolled * -0.1 * (index + 1);
+                    circle.style.transform = `translateY(${rate}px)`;
+                });
+            });
+
+            // Add floating animation to elements with animate-float class
+            const floatElements = document.querySelectorAll('.animate-float');
+            floatElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 2}s`;
+            });
+        });
+
+        // Add smooth page transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to all animate-fade-in elements
+            const fadeElements = document.querySelectorAll('.animate-fade-in');
+            fadeElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
             });
         });
     </script>

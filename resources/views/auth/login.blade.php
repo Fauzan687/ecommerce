@@ -35,6 +35,7 @@
             </div>
 
             <!-- Password Input -->
+             <!-- Password Input -->
             <div class="space-y-2">
                 <label for="password" class="flex items-center text-sm font-medium text-white">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,9 +43,28 @@
                     </svg>
                     Password
                 </label>
-                <input id="password" name="password" type="password" required 
-                       class="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-white/30 transition-all duration-300"
-                       placeholder="Masukkan password Anda">
+                <div class="relative">
+                    <input id="password" name="password" type="password" required 
+                           class="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-white/30 transition-all duration-300 pr-12"
+                           placeholder="Masukkan password Anda">
+                    <button type="button" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white/70 focus:outline-none" onclick="togglePassword('password')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="eye-icon-password">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between">
+                <label class="flex items-center">
+                    <input type="checkbox" name="remember" class="rounded bg-white/5 border-white/10 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-white/80">Ingat saya</span>
+                </label>
+                <a href="{{ route('password.request') }}" class="text-sm text-white hover:text-blue-200 transition-colors duration-200">
+                    Lupa password?
+                </a>
             </div>
 
             <!-- Error Messages -->
@@ -55,6 +75,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <span class="text-red-200 text-sm">{{ $errors->first() }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="bg-green-500/20 border border-green-500/30 rounded-2xl p-4">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span class="text-green-200 text-sm">{{ session('success') }}</span>
                     </div>
                 </div>
             @endif
@@ -80,26 +111,6 @@
                 </p>
             </div>
         </form>
-    </div>
-
-    <!-- Demo Accounts -->
-    <div class="mt-6 bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-        <h3 class="text-white/80 text-sm font-semibold mb-2 flex items-center">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Akun Demo
-        </h3>
-        <div class="grid grid-cols-1 gap-2 text-xs text-white/60">
-            <div class="flex justify-between">
-                <span>Admin:</span>
-                <span class="font-mono">admin@tokoonline.com / password</span>
-            </div>
-            <div class="flex justify-between">
-                <span>Customer:</span>
-                <span class="font-mono">customer@tokoonline.com / password</span>
-            </div>
-        </div>
     </div>
 </div>
 @endsection

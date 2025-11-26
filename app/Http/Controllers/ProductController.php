@@ -11,11 +11,24 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $products = Product::with('category')
-            ->filter(request(['search', 'category']))
-            ->latest()
-            ->paginate(12);
+        $query = Product::with('category');
         
+        // Filter search
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+        
+        // Filter category
+        if ($request->has('category') && $request->category != '') {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        }
+        
+        $products = $query->latest()->paginate(12);
         $categories = Category::withCount('products')->get();
         
         return view('products.index', compact('products', 'categories'));
